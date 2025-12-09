@@ -1,82 +1,18 @@
-
 <!DOCTYPE html>
-<html lang="nl">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medicijn Voorraad</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Medicijn Voorraad</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>Medicijn Voorraad</h1>
+  <div id="bijnaop"></div>
+  <button onclick="toonVoorraad()">Voorraad bekijken</button>
+  <button onclick="toonAddForm()">Medicijn toevoegen</button>
+  <input type="text" id="zoekveld" placeholder="Zoek medicijn..." onkeyup="zoek()">
+  <div id="content"></div>
 
-    <h1>Medicijn Voorraad</h1>
-
-    <!-- Waarschuwing bijna op -->
-    <div id="waarschuwing"></div>
-
-    <nav>
-        <button onclick="openTab('invoer')">Medicijn toevoegen</button>
-        <button onclick="openTab('voorraad')">Voorraad bekijken</button>
-    </nav>
-
-    <!-- Invoerscherm -->
-    <section id="invoer" class="tab active">
-        <h2>Medicijn toevoegen</h2>
-
-        <label>Naam medicijn:</label>
-        <input type="text" id="naam">
-
-        <label>Type (kies uit):</label>
-        <select id="type">
-            <option value="">-- Kies type --</option>
-            <option value="tabletten">Tabletten</option>
-            <option value="pillen">Pillen</option>
-            <option value="spuiten">Spuiten</option>
-            <option value="poeder">Poeder</option>
-            <option value="volume">Volume</option>
-        </select>
-
-        <label>Aantal:</label>
-        <input type="number" id="aantal">
-
-        <label>Startvoorraad:</label>
-        <input type="number" id="startvoorraad">
-
-        <label>Minimum:</label>
-        <input type="number" id="minimum">
-
-        <button onclick="opslaan()">Opslaan</button>
-        <p id="status"></p>
-    </section>
-
-    <!-- Voorraad scherm -->
-    <section id="voorraad" class="tab">
-        <h2>Huidige Voorraad</h2>
-
-        <!-- Vrije voorraad aanpassing -->
-        <div id="vrijAanpassen">
-            <label>Wijzig aantal (+/-):</label>
-            <input type="number" id="wijzigAantal" placeholder="bijv. 5 of -3">
-            <label>Kies medicijn:</label>
-            <select id="selectMedicijn"></select>
-            <button onclick="wijzigVoorraadVrij()">Pas voorraad aan</button>
-        </div>
-
-        <input type="text" id="zoekveld" placeholder="Zoek medicijn" oninput="zoekMedicijn()">
-
-        <table id="tabel">
-            <thead>
-                <tr>
-                    <th>Naam</th>
-                    <th>Type</th>
-                    <th>Aantal</th>
-                    <th>Acties</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </section>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

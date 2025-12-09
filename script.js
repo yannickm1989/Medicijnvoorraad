@@ -1,164 +1,113 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwjhRhdEVm2HU-EAtyPRqxD-MfTTaBOA5Pp7X4EEGCJb-ijpeY--kFFQUXhL5Nv2Eitjw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbydvHrO65CTY5wN2wixiFH49p90p27f3UlQTfyiwLezluKlqK_3lYkP3gK9dQpsBt4V/exec";
 const API_KEY = "89274643";
 
-// TAB wisselen
-function openTab(id) {
-    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
+// Voorraad ophalen en tonen
+async function toonVoorraad(){
+  const resp = await fetch(`${API_URL}?action=get&key=${API_KEY}`);
+  const data = await resp.json();
+  let html="<table border='1'><tr><th>Naam</th><th>Type</th><th>Aantal</th><th>Startvoorraad</th><th>Minimum</th><th>Aanpassen</th><th>Verwijderen</th></tr>";
+  data.forEach(item=>{
+    let kleur = item.aantal<=item.minimum ? "style='color:red'" : "";
+    html+=`<tr ${kleur}>
+      <td>${item.naam}</td>
+      <td>${item.type}</td>
+      <td>${item.aantal}</td>
+      <td>${item.startvoorraad}</td>
+      <td>${item.minimum}</td>
+      <td><button onclick="toonUpdateForm('${item.naam}')">Aanpassen</button></td>
+      <td><button onclick="deleteMedicijn('${item.naam}')">Verwijderen</button></td>
+    </tr>`;
+  });
+  html+="</table>";
+  document.getElementById("content").innerHTML=html;
+  toonBijnaOp();
 }
 
-// OPSLAAN medicijn
-async function opslaan() {
-    const naam = document.getElementById("naam").value.trim();
-    const type = document.getElementById("type").value;
-    const aantal = document.getElementById("aantal").value.trim();
-    const startvoorraad = document.getElementById("startvoorraad").value.trim();
-    const minimum = document.getElementById("minimum").value.trim();
-
-    if (!naam || !type || !aantal || !startvoorraad || !minimum) {
-        document.getElementById("status").innerText = "Gelieve alle velden in te vullen.";
-        return;
-    }
-
-    const url = `${API_URL}?action=add&key=${API_KEY}&naam=${encodeURIComponent(naam)}&type=${encodeURIComponent(type)}&aantal=${encodeURIComponent(aantal)}&startvoorraad=${encodeURIComponent(startvoorraad)}&minimum=${encodeURIComponent(minimum)}`;
-
-    const response = await fetch(url);
-    const data = await response.json();
-    document.getElementById("status").innerText = data.message;
-
-    ladenVoorraad();
-    laadWaarschuwingen();
+// Bijna op tonen
+async function toonBijnaOp(){
+  const resp = await fetch(`${API_URL}?action=bijnaop&key=${API_KEY}`);
+  const data = await resp.json();
+  let html="";
+  data.forEach(item=>html+=`<p style="color:red">Bijna op: ${item.naam} (${item.aantal})</p>`);
+  document.getElementById("bijnaop").innerHTML=html;
 }
 
-// VOORRAAD laden
-async function ladenVoorraad() {
-    const url = `${API_URL}?action=get&key=${API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "";
-
-    data.forEach(rij => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${rij.naam}</td>
-            <td>${rij.vorm || rij.type}</td>
-            <td>${rij.aantal}</td>
-            <td>
-                <button onclick="wijzigVoorraad('${rij.naam}', 1)">+1</button>
-                <button onclick="wijzigVoorraad('${rij.naam}', -1)">-1</button>
-                <button onclick="verwijderMedicijn('${rij.naam}')">Delete</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    vulSelectMedicijnen(data);
+// Zoekfunctie
+async function zoek(){
+  const q = document.getElementById("zoekveld").value;
+  const resp = await fetch(`${API_URL}?action=zoek&key=${API_KEY}&q=${q}`);
+  const data = await resp.json();
+  let html="<table border='1'><tr><th>Naam</th><th>Type</th><th>Aantal</th><th>Startvoorraad</th><th>Minimum</th><th>Aanpassen</th><th>Verwijderen</th></tr>";
+  data.forEach(item=>{
+    let kleur = item.aantal<=item.minimum ? "style='color:red'" : "";
+    html+=`<tr ${kleur}>
+      <td>${item.naam}</td>
+      <td>${item.type}</td>
+      <td>${item.aantal}</td>
+      <td>${item.startvoorraad}</td>
+      <td>${item.minimum}</td>
+      <td><button onclick="toonUpdateForm('${item.naam}')">Aanpassen</button></td>
+      <td><button onclick="deleteMedicijn('${item.naam}')">Verwijderen</button></td>
+    </tr>`;
+  });
+  html+="</table>";
+  document.getElementById("content").innerHTML=html;
 }
 
-// Vul dropdown voor vrije voorraad-aanpassing
-function vulSelectMedicijnen(data) {
-    const select = document.getElementById("selectMedicijn");
-    select.innerHTML = '<option value="">-- Kies medicijn --</option>';
-    data.forEach(rij => {
-        const option = document.createElement("option");
-        option.value = rij.naam;
-        option.text = rij.naam;
-        select.appendChild(option);
-    });
+// Formulier toevoegen
+function toonAddForm(){
+  document.getElementById("content").innerHTML=`
+  <h3>Medicijn toevoegen</h3>
+  Naam: <input type="text" id="naam"><br>
+  Type: <select id="type">
+    <option value="tabletten">Tabletten</option>
+    <option value="pillen">Pillen</option>
+    <option value="poeder">Poeder</option>
+    <option value="spuiten">Spuiten</option>
+    <option value="volume">Volume</option>
+  </select><br>
+  Aantal: <input type="number" id="aantal"><br>
+  Startvoorraad: <input type="number" id="startvoorraad"><br>
+  Minimum: <input type="number" id="minimum"><br>
+  <button onclick="addMedicijn()">Opslaan</button>
+  `;
 }
 
-// Voorraad wijzigen (+1 / -1 knoppen)
-async function wijzigVoorraad(naam, wijzig) {
-    const url = `${API_URL}?action=update&key=${API_KEY}&naam=${encodeURIComponent(naam)}&wijzig=${wijzig}`;
-    await fetch(url);
-    ladenVoorraad();
-    laadWaarschuwingen();
+// Toevoegen
+async function addMedicijn(){
+  const naam=document.getElementById("naam").value;
+  const type=document.getElementById("type").value;
+  const aantal=document.getElementById("aantal").value;
+  const startvoorraad=document.getElementById("startvoorraad").value;
+  const minimum=document.getElementById("minimum").value;
+  const resp = await fetch(`${API_URL}?action=add&key=${API_KEY}&naam=${encodeURIComponent(naam)}&type=${encodeURIComponent(type)}&aantal=${aantal}&startvoorraad=${startvoorraad}&minimum=${minimum}`);
+  const result = await resp.json();
+  alert(result.message);
+  toonVoorraad();
 }
 
-// Vrije voorraad-aanpassing via input + dropdown
-async function wijzigVoorraadVrij() {
-    const naam = document.getElementById("selectMedicijn").value;
-    const aantal = parseInt(document.getElementById("wijzigAantal").value);
-
-    if (!naam || isNaN(aantal)) {
-        alert("Gelieve een medicijn te kiezen en een geldig aantal in te vullen.");
-        return;
-    }
-
-    const url = `${API_URL}?action=update&key=${API_KEY}&naam=${encodeURIComponent(naam)}&wijzig=${aantal}`;
-    await fetch(url);
-
-    document.getElementById("wijzigAantal").value = "";
-    document.getElementById("selectMedicijn").value = "";
-    ladenVoorraad();
-    laadWaarschuwingen();
+// Voorraad aanpassen
+function toonUpdateForm(naam){
+  document.getElementById("content").innerHTML=`
+    <h3>Voorraad aanpassen: ${naam}</h3>
+    Aantal wijziging (bijv. +5 of -3): <input type="number" id="wijzig"><br>
+    <button onclick="updateMedicijn('${naam}')">Opslaan</button>
+  `;
 }
 
-// Delete medicijn
-async function verwijderMedicijn(naam) {
-    if (!confirm(`Weet je zeker dat je ${naam} wilt verwijderen?`)) return;
-
-    const url = `${API_URL}?action=delete&key=${API_KEY}&naam=${encodeURIComponent(naam)}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    alert(data.message);
-
-    ladenVoorraad();
-    laadWaarschuwingen();
+async function updateMedicijn(naam){
+  const wijzig=document.getElementById("wijzig").value;
+  const resp=await fetch(`${API_URL}?action=update&key=${API_KEY}&naam=${encodeURIComponent(naam)}&wijzig=${encodeURIComponent(wijzig)}`);
+  const result=await resp.json();
+  alert(result.message);
+  toonVoorraad();
 }
 
-// WAARSCHUWING bijna op
-async function laadWaarschuwingen() {
-    const url = `${API_URL}?action=bijnaop&key=${API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    const waarschuwingDiv = document.getElementById("waarschuwing");
-    if (data.length === 0) {
-        waarschuwingDiv.innerText = "";
-    } else {
-        let tekst = "⚠️ Bijna op: ";
-        data.forEach(item => {
-            tekst += `${item.naam} (${item.aantal})  `;
-        });
-        waarschuwingDiv.innerText = tekst;
-    }
+// Verwijderen
+async function deleteMedicijn(naam){
+  if(!confirm(`Weet je zeker dat je ${naam} wilt verwijderen?`)) return;
+  const resp=await fetch(`${API_URL}?action=delete&key=${API_KEY}&naam=${encodeURIComponent(naam)}`);
+  const result=await resp.json();
+  alert(result.message);
+  toonVoorraad();
 }
-
-// ZOEKEN medicijn
-async function zoekMedicijn() {
-    const query = document.getElementById("zoekveld").value.trim();
-    const url = `${API_URL}?action=zoek&q=${encodeURIComponent(query)}&key=${API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "";
-
-    data.forEach(rij => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${rij.naam}</td>
-            <td>${rij.vorm || rij.type}</td>
-            <td>${rij.aantal}</td>
-            <td>
-                <button onclick="wijzigVoorraad('${rij.naam}', 1)">+1</button>
-                <button onclick="wijzigVoorraad('${rij.naam}', -1)">-1</button>
-                <button onclick="verwijderMedicijn('${rij.naam}')">Delete</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    vulSelectMedicijnen(data);
-}
-
-// Laden bij openen
-window.onload = function() {
-    ladenVoorraad();
-    laadWaarschuwingen();
-    setInterval(laadWaarschuwingen, 60000); // update elke minuut
-};
