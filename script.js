@@ -10,7 +10,7 @@ function openTab(id) {
 // OPSLAAN medicijn
 async function opslaan() {
     const naam = document.getElementById("naam").value.trim();
-    const type = document.getElementById("type").value.trim();
+    const type = document.getElementById("type").value;
     const aantal = document.getElementById("aantal").value.trim();
     const startvoorraad = document.getElementById("startvoorraad").value.trim();
     const minimum = document.getElementById("minimum").value.trim();
@@ -26,7 +26,6 @@ async function opslaan() {
     const data = await response.json();
     document.getElementById("status").innerText = data.message;
 
-    // Voorraad en waarschuwingen updaten
     ladenVoorraad();
     laadWaarschuwingen();
 }
@@ -44,11 +43,12 @@ async function ladenVoorraad() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td>${rij.naam}</td>
-            <td>${rij.type}</td>
+            <td>${rij.vorm || rij.type}</td>
             <td>${rij.aantal}</td>
             <td>
                 <button onclick="wijzigVoorraad('${rij.naam}', 1)">+1</button>
                 <button onclick="wijzigVoorraad('${rij.naam}', -1)">-1</button>
+                <button onclick="verwijderMedicijn('${rij.naam}')">Delete</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -59,6 +59,20 @@ async function ladenVoorraad() {
 async function wijzigVoorraad(naam, wijzig) {
     const url = `${API_URL}?action=update&key=${API_KEY}&naam=${encodeURIComponent(naam)}&wijzig=${wijzig}`;
     await fetch(url);
+    ladenVoorraad();
+    laadWaarschuwingen();
+}
+
+// Delete medicijn
+async function verwijderMedicijn(naam) {
+    if (!confirm(`Weet je zeker dat je ${naam} wilt verwijderen?`)) return;
+
+    const url = `${API_URL}?action=delete&key=${API_KEY}&naam=${encodeURIComponent(naam)}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    alert(data.message);
+
     ladenVoorraad();
     laadWaarschuwingen();
 }
@@ -100,6 +114,7 @@ async function zoekMedicijn() {
             <td>
                 <button onclick="wijzigVoorraad('${rij.naam}', 1)">+1</button>
                 <button onclick="wijzigVoorraad('${rij.naam}', -1)">-1</button>
+                <button onclick="verwijderMedicijn('${rij.naam}')">Delete</button>
             </td>
         `;
         tbody.appendChild(tr);

@@ -24,8 +24,15 @@
         <label>Naam medicijn:</label>
         <input type="text" id="naam">
 
-        <label>Type (tabletten, pillen, spuiten, poeder, volume):</label>
-        <input type="text" id="type">
+        <label>Type (kies uit):</label>
+        <select id="type">
+            <option value="">-- Kies type --</option>
+            <option value="tabletten">Tabletten</option>
+            <option value="pillen">Pillen</option>
+            <option value="spuiten">Spuiten</option>
+            <option value="poeder">Poeder</option>
+            <option value="volume">Volume</option>
+        </select>
 
         <label>Aantal:</label>
         <input type="number" id="aantal">
@@ -62,3 +69,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
