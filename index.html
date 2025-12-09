@@ -1,206 +1,55 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medicijn Voorraad App</title>
-
-<style>
-body { font-family: Arial; margin:0; padding:0; background:#f5f5f5; }
-
-header {
-    background:#007bff;
-    color:white;
-    padding:15px;
-    text-align:center;
-    font-size:22px;
-}
-
-.tab-buttons {
-    display:flex;
-    background:white;
-}
-
-.tab-buttons button {
-    flex:1;
-    padding:15px;
-    border:none;
-    background:#e0e0e0;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.tab-buttons button.active {
-    background:white;
-    border-bottom:3px solid #007bff;
-    font-weight:bold;
-}
-
-.page {
-    display:none;
-    padding:20px;
-}
-
-.page.active {
-    display:block;
-}
-
-input, select, button {
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    font-size:16px;
-}
-
-button.action {
-    background:#007bff;
-    color:white;
-    border:none;
-    border-radius:8px;
-}
-
-.box {
-    background:white;
-    padding:15px;
-    border-radius:10px;
-    margin-top:15px;
-}
-
-li { margin-bottom:8px; }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medicijn Voorraad</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<header>💊 Medicijn Voorraad</header>
+    <h1>Medicijn Voorraad</h1>
 
-<div class="tab-buttons">
-    <button id="tab1" class="active" onclick="openTab('invoer')">Invoeren</button>
-    <button id="tab2" onclick="openTab('voorraad')">Voorraad</button>
-</div>
+    <nav>
+        <button onclick="openTab('invoer')">Medicijn toevoegen</button>
+        <button onclick="openTab('voorraad')">Voorraad bekijken</button>
+    </nav>
 
-<!-- TAB 1: INVOER / GEBRUIK -->
-<div id="invoer" class="page active">
+    <!-- 📌 TAB 1: Invoer -->
+    <section id="invoer" class="tab active">
+        <h2>Medicijn toevoegen</h2>
 
-    <div class="box">
-        <label>Naam van medicijn:</label>
-        <input type="text" id="medicijnNaam">
+        <label>Naam medicijn:</label>
+        <input type="text" id="naam" />
 
-        <label>Type:</label>
-        <select id="medicijnType">
-            <option value="tabletten">tabletten</option>
-            <option value="pillen">pillen</option>
-            <option value="poeder">poeder</option>
-            <option value="spuiten">spuiten</option>
-            <option value="volume">volume</option>
-        </select>
+        <label>Type (tabletten, pillen, spuiten, poeder, volume, ...):</label>
+        <input type="text" id="type" />
 
-        <label>Aantal / Volume:</label>
-        <input type="number" id="medicijnAantal">
+        <label>Aantal:</label>
+        <input type="number" id="aantal" />
 
-        <button class="action" onclick="voegMedicijnToe()">Voeg toe</button>
-        <button class="action" onclick="gebruikMedicijn()">Gebruik</button>
-    </div>
-</div>
+        <button onclick="opslaan()">Opslaan</button>
 
-<!-- TAB 2: VOORRAAD -->
-<div id="voorraad" class="page">
-    <div class="box">
-        <h3>📋 Voorraad</h3>
-        <div id="voorraadLijst">Nog geen gegevens…</div>
-    </div>
-</div>
+        <p id="status"></p>
+    </section>
 
+    <!-- 📌 TAB 2: Voorraad -->
+    <section id="voorraad" class="tab">
+        <h2>Huidige Voorraad</h2>
+        <table id="tabel">
+            <thead>
+                <tr>
+                    <th>Naam</th>
+                    <th>Type</th>
+                    <th>Aantal</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
-<script>
-// ------------------------
-// TAB NAVIGATIE
-// ------------------------
-function openTab(tab) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-buttons button').forEach(b => b.classList.remove('active'));
+        <button onclick="ladenVoorraad()">Voorraad vernieuwen</button>
+    </section>
 
-    document.getElementById(tab).classList.add('active');
-    document.getElementById("tab" + (tab === 'invoer' ? "1" : "2")).classList.add('active');
-
-    if (tab === "voorraad") toonVoorraad();
-}
-
-// Voorraad opslaan in localStorage
-let voorraad = JSON.parse(localStorage.getItem("voorraadMedicijnen")) || {};
-
-function save() {
-    localStorage.setItem("voorraadMedicijnen", JSON.stringify(voorraad));
-}
-
-// ------------------------
-// MEDICIJN TOEVOEGEN
-// ------------------------
-function voegMedicijnToe() {
-    let naam = document.getElementById("medicijnNaam").value.trim();
-    let type = document.getElementById("medicijnType").value;
-    let aantal = parseFloat(document.getElementById("medicijnAantal").value);
-
-    if (!naam || isNaN(aantal) || aantal <= 0) {
-        alert("Vul een correcte naam + aantal in.");
-        return;
-    }
-
-    if (voorraad[naam]) {
-        voorraad[naam].aantal += aantal;
-    } else {
-        voorraad[naam] = { aantal: aantal, type: type };
-    }
-
-    save();
-    alert("Toegevoegd!");
-    toonVoorraad();
-}
-
-// ------------------------
-// MEDICIJN GEBRUIKEN
-// ------------------------
-function gebruikMedicijn() {
-    let naam = document.getElementById("medicijnNaam").value.trim();
-    let aantal = parseFloat(document.getElementById("medicijnAantal").value);
-
-    if (!voorraad[naam]) {
-        alert("Dit medicijn bestaat niet.");
-        return;
-    }
-
-    if (isNaN(aantal) || aantal <= 0) {
-        alert("Ongeldig aantal.");
-        return;
-    }
-
-    if (voorraad[naam].aantal < aantal) {
-        alert("Niet genoeg voorraad!");
-        return;
-    }
-
-    voorraad[naam].aantal -= aantal;
-    save();
-
-    alert("Gebruikt!");
-    toonVoorraad();
-}
-
-// ------------------------
-// VOORRAAD TONEN
-// ------------------------
-function toonVoorraad() {
-    let div = document.getElementById("voorraadLijst");
-    let html = "<ul>";
-
-    for (let naam in voorraad) {
-        html += `<li><strong>${naam}</strong>: ${voorraad[naam].aantal} ${voorraad[naam].type}</li>`;
-    }
-
-    html += "</ul>";
-    div.innerHTML = html;
-}
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
