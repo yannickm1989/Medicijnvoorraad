@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Medicijn toevoegen</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header"><h1>Nieuw medicijn</h1></header>
+  <main class="container">
+    <label>Naam</label>
+    <input id="naam" placeholder="Bijv. Paracetamol" />
+
+    <label>Type</label>
+    <select id="type">
+      <option value="">-- kies type --</option>
+      <option value="tabletten">Tabletten</option>
+      <option value="pillen">Pillen</option>
+      <option value="spuiten">Spuiten</option>
+      <option value="poeder">Poeder</option>
+      <option value="volume">Volume</option>
+    </select>
+
+    <label>Aantal</label>
+    <input id="aantal" type="number" min="0" />
+
+    <label>Startvoorraad</label>
+    <input id="startvoorraad" type="number" min="0" />
+
+    <label>Minimum</label>
+    <input id="minimum" type="number" min="0" />
+
+    <div class="buttons">
+      <button onclick="saveNew()">Opslaan</button>
+      <button onclick="location.href='index.html'">Annuleren</button>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    function saveNew(){
+      const naam = document.getElementById('naam').value.trim();
+      const type = document.getElementById('type').value;
+      const aantal = document.getElementById('aantal').value;
+      const start = document.getElementById('startvoorraad').value;
+      const minimum = document.getElementById('minimum').value;
+
+      if(!naam || !type || aantal === '' || start === '' || minimum === ''){
+        alert('Vul alle velden in.');
+        return;
+      }
+
+      App.addItem({naam, type, aantal: Number(aantal), startvoorraad: Number(start), minimum: Number(minimum)});
+      alert('Medicijn toegevoegd.');
+      location.href = 'voorraad.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Verwijder medicijn</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header"><h1>Verwijderen</h1></header>
+  <main class="container">
+    <label>Kies medicijn</label>
+    <select id="sel"></select>
+    <div class="buttons">
+      <button onclick="doDelete()">Verwijder</button>
+      <button onclick="location.href='voorraad.html'">Annuleren</button>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    function populate(){
+      const sel = document.getElementById('sel');
+      sel.innerHTML = '';
+      App.getAll().forEach(it => {
+        const o = document.createElement('option');
+        o.value = it.naam;
+        o.text = `${it.naam} (${it.aantal})`;
+        sel.appendChild(o);
+      });
+    }
+    function doDelete(){
+      const sel = document.getElementById('sel');
+      const naam = sel.value;
+      if(!naam) return alert('Kies eerst iets');
+      if(!confirm(`Verwijder ${naam}?`)) return;
+      App.deleteItem(naam);
+      alert('Verwijderd');
+      location.href='voorraad.html';
+    }
+    window.addEventListener('DOMContentLoaded', populate);
+  </script>
+</body>
+</html>

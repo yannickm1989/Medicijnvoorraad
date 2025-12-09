@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Medicijn Voorraad — Voorraad</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header"><h1>Voorraad</h1></header>
+  <main class="container">
+    <div class="top-row">
+      <button onclick="location.href='index.html'">Terug</button>
+      <input id="zoekveld" placeholder="Zoek medicijn..." oninput="renderTable()" />
+    </div>
+
+    <div id="tableContainer" class="table-container"></div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    function renderTable() {
+      const q = document.getElementById('zoekveld').value.trim().toLowerCase();
+      const data = App.getAll();
+      const filtered = q ? data.filter(i => i.naam.toLowerCase().includes(q)) : data;
+
+      const container = document.getElementById('tableContainer');
+      if (filtered.length === 0) {
+        container.innerHTML = '<p>Geen items gevonden.</p>';
+        return;
+      }
+
+      let html = '<table><thead><tr><th>Naam</th><th>Type</th><th>Aantal</th><th>Start</th><th>Min</th><th>Actie</th></tr></thead><tbody>';
+      filtered.forEach(item => {
+        const bijna = Number(item.aantal) <= Number(item.minimum);
+        const rowStyle = bijna ? ' class="row-bijna"' : '';
+        html += `<tr${rowStyle}>
+          <td>${item.naam}</td>
+          <td>${item.type}</td>
+          <td>${item.aantal}</td>
+          <td>${item.startvoorraad}</td>
+          <td>${item.minimum}</td>
+          <td>
+            <button class="small" onclick="openUpdate('${encodeURIComponent(item.naam)}')">Aanpassen</button>
+            <button class="small" onclick="quickAdjust('${encodeURIComponent(item.naam)}',1)">+1</button>
+            <button class="small" onclick="quickAdjust('${encodeURIComponent(item.naam)}',-1)">-1</button>
+            <button class="small delete" onclick="removeItem('${encodeURIComponent(item.naam)}')">Verwijder</button>
+          </td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function openUpdate(naamEncoded){
+      const naam = decodeURIComponent(naamEncoded);
+      location.href = `update.html?naam=${encodeURIComponent(naam)}`;
+    }
+
+    function quickAdjust(naamEncoded, diff){
+      const naam = decodeURIComponent(naamEncoded);
+      App.updateAmount(naam, diff);
+      renderTable();
+    }
+
+    function removeItem(naamEncoded){
+      const naam = decodeURIComponent(naamEncoded);
+      if (!confirm(`Weet je zeker dat je ${naam} wilt verwijderen?`)) return;
+      App.deleteItem(naam);
+      renderTable();
+    }
+
+    // initial render
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTable();
+    });
+  </script>
+</body>
+</html>

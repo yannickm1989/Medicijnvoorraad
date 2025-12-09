@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Voorraad aanpassen</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header"><h1>Voorraad aanpassen</h1></header>
+  <main class="container">
+    <div id="info"></div>
+
+    <label>Aanpassing (gebruik + of -), bijvoorbeeld: 5 of -3</label>
+    <input id="wijzig" type="number" />
+
+    <div class="buttons">
+      <button id="saveBtn">Opslaan</button>
+      <button onclick="location.href='voorraad.html'">Annuleren</button>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    // haal naam uit querystring
+    function getQueryParam(name){
+      const params = new URLSearchParams(location.search);
+      return params.get(name);
+    }
+
+    const naam = getQueryParam('naam');
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('info').innerText = `Medicijn: ${naam}`;
+      document.getElementById('saveBtn').addEventListener('click', () => {
+        const wijzig = Number(document.getElementById('wijzig').value);
+        if (isNaN(wijzig) || wijzig === 0) { alert('Vul een geldig verschil in'); return; }
+        App.updateAmount(naam, wijzig);
+        alert('Voorraad aangepast');
+        location.href = 'voorraad.html';
+      });
+    });
+  </script>
+</body>
+</html>
