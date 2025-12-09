@@ -1,53 +1,62 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicijn Voorraad</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <h1>Medicijn Voorraad</h1>
+
+    <!-- Waarschuwing bijna op -->
+    <div id="waarschuwing"></div>
 
     <nav>
         <button onclick="openTab('invoer')">Medicijn toevoegen</button>
         <button onclick="openTab('voorraad')">Voorraad bekijken</button>
     </nav>
 
-    <!-- 📌 TAB 1: Invoer -->
+    <!-- Invoerscherm -->
     <section id="invoer" class="tab active">
         <h2>Medicijn toevoegen</h2>
-
         <label>Naam medicijn:</label>
-        <input type="text" id="naam" />
+        <input type="text" id="naam">
 
-        <label>Type (tabletten, pillen, spuiten, poeder, volume, ...):</label>
-        <input type="text" id="type" />
+        <label>Type (tabletten, pillen, spuiten, poeder, volume):</label>
+        <input type="text" id="type">
 
         <label>Aantal:</label>
-        <input type="number" id="aantal" />
+        <input type="number" id="aantal">
+
+        <label>Startvoorraad:</label>
+        <input type="number" id="startvoorraad">
+
+        <label>Minimum:</label>
+        <input type="number" id="minimum">
 
         <button onclick="opslaan()">Opslaan</button>
-
         <p id="status"></p>
     </section>
 
-    <!-- 📌 TAB 2: Voorraad -->
+    <!-- Voorraad scherm -->
     <section id="voorraad" class="tab">
         <h2>Huidige Voorraad</h2>
+
+        <input type="text" id="zoekveld" placeholder="Zoek medicijn" oninput="zoekMedicijn()">
+
         <table id="tabel">
             <thead>
                 <tr>
                     <th>Naam</th>
                     <th>Type</th>
                     <th>Aantal</th>
+                    <th>Acties</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-
-        <button onclick="ladenVoorraad()">Voorraad vernieuwen</button>
     </section>
 
     <script src="script.js"></script>
