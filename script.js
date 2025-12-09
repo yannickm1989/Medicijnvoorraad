@@ -53,12 +53,45 @@ async function ladenVoorraad() {
         `;
         tbody.appendChild(tr);
     });
+
+    vulSelectMedicijnen(data);
 }
 
-// Voorraad wijzigen (+1 / -1)
+// Vul dropdown voor vrije voorraad-aanpassing
+function vulSelectMedicijnen(data) {
+    const select = document.getElementById("selectMedicijn");
+    select.innerHTML = '<option value="">-- Kies medicijn --</option>';
+    data.forEach(rij => {
+        const option = document.createElement("option");
+        option.value = rij.naam;
+        option.text = rij.naam;
+        select.appendChild(option);
+    });
+}
+
+// Voorraad wijzigen (+1 / -1 knoppen)
 async function wijzigVoorraad(naam, wijzig) {
     const url = `${API_URL}?action=update&key=${API_KEY}&naam=${encodeURIComponent(naam)}&wijzig=${wijzig}`;
     await fetch(url);
+    ladenVoorraad();
+    laadWaarschuwingen();
+}
+
+// Vrije voorraad-aanpassing via input + dropdown
+async function wijzigVoorraadVrij() {
+    const naam = document.getElementById("selectMedicijn").value;
+    const aantal = parseInt(document.getElementById("wijzigAantal").value);
+
+    if (!naam || isNaN(aantal)) {
+        alert("Gelieve een medicijn te kiezen en een geldig aantal in te vullen.");
+        return;
+    }
+
+    const url = `${API_URL}?action=update&key=${API_KEY}&naam=${encodeURIComponent(naam)}&wijzig=${aantal}`;
+    await fetch(url);
+
+    document.getElementById("wijzigAantal").value = "";
+    document.getElementById("selectMedicijn").value = "";
     ladenVoorraad();
     laadWaarschuwingen();
 }
@@ -119,6 +152,8 @@ async function zoekMedicijn() {
         `;
         tbody.appendChild(tr);
     });
+
+    vulSelectMedicijnen(data);
 }
 
 // Laden bij openen

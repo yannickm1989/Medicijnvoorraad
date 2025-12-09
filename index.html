@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -21,6 +22,7 @@
     <!-- Invoerscherm -->
     <section id="invoer" class="tab active">
         <h2>Medicijn toevoegen</h2>
+
         <label>Naam medicijn:</label>
         <input type="text" id="naam">
 
@@ -51,6 +53,15 @@
     <section id="voorraad" class="tab">
         <h2>Huidige Voorraad</h2>
 
+        <!-- Vrije voorraad aanpassing -->
+        <div id="vrijAanpassen">
+            <label>Wijzig aantal (+/-):</label>
+            <input type="number" id="wijzigAantal" placeholder="bijv. 5 of -3">
+            <label>Kies medicijn:</label>
+            <select id="selectMedicijn"></select>
+            <button onclick="wijzigVoorraadVrij()">Pas voorraad aan</button>
+        </div>
+
         <input type="text" id="zoekveld" placeholder="Zoek medicijn" oninput="zoekMedicijn()">
 
         <table id="tabel">
@@ -69,4 +80,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
