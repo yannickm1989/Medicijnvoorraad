@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxcwTnKnY49Ay9ZRSdV_GClL6lGr34Bgfjbu5eG0POyWJGho2D6BWfS2E4o13KiYAoq-g/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwjhRhdEVm2HU-EAtyPRqxD-MfTTaBOA5Pp7X4EEGCJb-ijpeY--kFFQUXhL5Nv2Eitjw/exec";
 const API_KEY = "89274643";
 
 // TAB wisselen
